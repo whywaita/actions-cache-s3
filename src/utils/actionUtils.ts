@@ -86,18 +86,24 @@ export function getInputS3ClientConfig(): S3ClientConfig | undefined {
         return undefined;
     }
 
+    const credentials = core.getInput(Inputs.AWSAccessKeyId)
+        ? {
+            credentials: {
+                accessKeyId:
+                    core.getInput(Inputs.AWSAccessKeyId) ||
+                    process.env["AWS_ACCESS_KEY_ID"],
+                secretAccessKey:
+                    core.getInput(Inputs.AWSSecretAccessKey) ||
+                    process.env["AWS_SECRET_ACCESS_KEY"],
+                sessionToken:
+                    core.getInput(Inputs.AWSSessionToken) ||
+                    process.env["AWS_SESSION_TOKEN"]
+            }
+        }
+        : null;
+
     const s3config = {
-        credentials: {
-            accessKeyId:
-                core.getInput(Inputs.AWSAccessKeyId) ||
-                process.env["AWS_ACCESS_KEY_ID"],
-            secretAccessKey:
-                core.getInput(Inputs.AWSSecretAccessKey) ||
-                process.env["AWS_SECRET_ACCESS_KEY"],
-            sessionToken:
-                core.getInput(Inputs.AWSSessionToken) ||
-                process.env["AWS_SESSION_TOKEN"]
-        },
+        ...credentials,
         region: core.getInput(Inputs.AWSRegion) || process.env["AWS_REGION"],
         endpoint: core.getInput(Inputs.AWSEndpoint),
         bucketEndpoint: core.getBooleanInput(Inputs.AWSS3BucketEndpoint),
