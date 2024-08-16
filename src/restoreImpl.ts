@@ -35,7 +35,10 @@ export async function restoreImpl(
         const cachePaths = utils.getInputAsArray(Inputs.Path, {
             required: true
         });
-        const s3BucketName = core.getInput(Inputs.AWSS3Bucket);
+        let s3BucketName = core.getInput(Inputs.AWSS3Bucket);
+        if (s3BucketName.endsWith(".amazonaws.com")) {
+            s3BucketName = s3BucketName.split(".")[0];
+        }
         const s3config = utils.getInputS3ClientConfig();
 
         const enableCrossOsArchive = utils.getInputAsBool(
